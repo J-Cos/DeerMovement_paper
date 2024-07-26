@@ -104,9 +104,7 @@ m12 <- df |> fit_clogit(case_ ~ landcover*sex*season*elevation*distance + strata
 summary(m12)
 
 m13 <- df |> fit_clogit(case_ ~ landcover*sex*season*elevation+distance:sex + strata(id) + strata(step_id_))
-sink("ExampleModel.txt")
 summary(m13)
-unlink("ExampleModel.txt")
 
 AIC(m0)
 AIC(m1)
@@ -131,3 +129,6 @@ AIC(m12)
 AIC(m13)
 #m10 is best
 
+#save an example model
+sink("Outputs/ExampleModel.txt")
+summary(m13)
