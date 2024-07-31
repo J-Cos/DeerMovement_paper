@@ -8,13 +8,13 @@ library(tidyverse)
 
 # load rasters from GEE
 e<-rast("Data/Corsica_elevation.tif")
+s<-rast("Data/Corsica_slope.tif")
 lc<-as.factor(rast("Data/Corsica_landCover.tif"))
 rd<-rast("Data/Corsica_roadDistance.tif")
 
-
 #make corsica masked raster
 mask<-lc==0
-r<-mask(x=c(lc, e, rd), mask=mask, maskvalues=1, updatevalue=NA )
+r<-mask(x=c(lc, e, s, rd), mask=mask, maskvalues=1, updatevalue=NA )
 r<-project(r, "EPSG:31467")
 
 #########################
@@ -25,6 +25,11 @@ ggplot()+
 
 ggplot()+
     geom_spatraster(data=r, aes(fill=elevation))+
+    theme_minimal()
+
+
+ggplot()+
+    geom_spatraster(data=r, aes(fill=slope))+
     theme_minimal()
 
 values(r$landcover) %>% table
