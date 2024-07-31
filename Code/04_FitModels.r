@@ -42,6 +42,139 @@ df<-df %>%
         season ==2 ~ "Winter",
         season == 1 ~ "Summer"))) 
 
+
+
+########################
+#modelling
+###########################
+# saturated plausible model
+spm <- df |> fit_clogit(
+    case_ ~ 
+    landcover + slope + distance + sl_ + ta_ +
+    sl_:landcover + ta_:distance + ta_:landcover + sl_:slope + sl_:sex + landcover:distance + season:slope +distance:season +ta_:slope +
+    sl_:sex:season + 
+    sl_:sex:season:landcover +
+    strata(id) + strata(step_id_))
+
+summary(spm)
+AIC(spm)
+
+######################
+#complex down
+#######################
+
+#remove sl_:sex:season:landcover
+m2 <- df |> fit_clogit(
+    case_ ~ 
+    landcover + slope + distance + sl_ + ta_ +
+    sl_:landcover + ta_:distance + ta_:landcover + sl_:slope + sl_:sex + landcover:distance + season:slope +distance:season +ta_:slope +
+    sl_:sex:season + 
+    strata(id) + strata(step_id_))
+
+AIC(m2)
+#worse
+
+m3 <- df |> fit_clogit(
+    case_ ~ 
+    landcover + slope + distance + sl_ + ta_ +
+    sl_:landcover + ta_:landcover + sl_:slope + sl_:sex + landcover:distance + season:slope +distance:season +ta_:slope +
+    sl_:sex:season + 
+    sl_:sex:season:landcover +
+    strata(id) + strata(step_id_))
+
+
+AIC(m3)
+#better
+summary(m3)
+
+m4 <- df |> fit_clogit(
+    case_ ~ 
+    landcover + slope + distance + sl_ + ta_ +
+    sl_:landcover + ta_:landcover + sl_:slope + landcover:distance + season:slope +distance:season +ta_:slope +
+    sl_:sex:season + 
+    sl_:sex:season:landcover +
+    strata(id) + strata(step_id_))
+
+
+AIC(m4)
+#same
+summary(m4)
+
+m5 <- df |> fit_clogit(
+    case_ ~ 
+    landcover + slope + distance + sl_ + ta_ +
+    sl_:landcover + ta_:landcover + sl_:slope + landcover:distance + distance:season + ta_:slope +
+    sl_:sex:season + 
+    sl_:sex:season:landcover +
+    strata(id) + strata(step_id_))
+
+
+AIC(m5)
+#better
+summary(m5)
+
+m6 <- df |> fit_clogit(
+    case_ ~ 
+    landcover + slope + distance + sl_ + ta_ +
+    sl_:landcover + ta_:landcover + sl_:slope + landcover:distance + ta_:slope +
+    sl_:sex:season + 
+    sl_:sex:season:landcover +
+    strata(id) + strata(step_id_))
+
+
+AIC(m6)
+#better
+summary(m6)
+
+m7 <- df |> fit_clogit(
+    case_ ~ 
+    landcover + slope + distance + sl_ + ta_ +
+    sl_:landcover + sl_:slope + landcover:distance + ta_:slope +
+    sl_:sex:season + 
+    sl_:sex:season:landcover +
+    strata(id) + strata(step_id_))
+
+
+AIC(m7)
+#worse
+
+
+m8 <- df |> fit_clogit(
+    case_ ~ 
+    landcover + slope + distance + sl_ + 
+    sl_:landcover + ta_:landcover + sl_:slope + landcover:distance + ta_:slope +
+    sl_:sex:season + 
+    sl_:sex:season:landcover +
+    strata(id) + strata(step_id_))
+
+
+AIC(m8)
+#same
+summary(m8)
+
+m9 <- df |> fit_clogit(
+    case_ ~ 
+    landcover + slope + distance + sl_ + 
+    sl_:landcover + ta_:landcover + sl_:slope + landcover:distance + ta_:slope +
+    sl_:sex:season + 
+    strata(id) + strata(step_id_))
+
+AIC(m9)
+#worse
+
+#therfore m8 best
+sink("Outputs/BestModel.txt")
+summary(m8)
+
+
+###########################################################################################################
+# end of code
+#######################################################################################################
+
+
+
+
+
 #explore some models
 m0 <- df |> fit_clogit(case_ ~ landcover + elevation  + strata(id) + strata(step_id_))
 summary(m0)
