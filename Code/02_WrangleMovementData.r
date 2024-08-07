@@ -11,7 +11,7 @@ library(sf)
 df<-readRDS("Outputs/RawMoveData.RDS") %>%
     mt_as_event_attribute(., "sex")
 
-#get sex mapping
+#get sex mapping - this individual wise data otherwise gets automatically removed in the amt data wrngling process
 sexmap<-df%>%
     as_tibble %>%
     group_by(individual_local_identifier) %>%
