@@ -17,8 +17,9 @@ var dataset = ee.Image('COPERNICUS/CORINE/V20/100m/2018');
 var landCover = dataset.select('landcover').clip(Corsica);
 
 // get road data and distances
-var grip4_europe = ee.FeatureCollection("projects/sat-io/open-datasets/GRIP4/Europe");
-var distance = grip4_europe.distance({searchRadius: 50000, maxError: 50}).clip(Corsica);
+//var grip4_europe = ee.FeatureCollection("projects/sat-io/open-datasets/GRIP4/Europe");
+// load data provided by Stevan
+var distance = CorsicaMainRoads.distance({searchRadius: 50000, maxError: 50}).clip(Corsica);
 
 //
 //output data at standard resolution
