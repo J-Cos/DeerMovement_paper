@@ -56,5 +56,13 @@ ggplot()+
     theme_minimal()
 
 #################
-#output
+#output as tif for SSF
 terra::writeRaster(r, "Outputs/CombinedRaster.tif", overwrite=TRUE)
+
+#output as ascii for ABM
+r<-project(r, "EPSG:4258")
+dir.create("Outputs/ASCIIs")
+writeRaster(r$landcover, "Outputs/ASCIIs/landcover.asc", overwrite = T, NAflag = -1000)
+writeRaster(r$elevation, "Outputs/ASCIIs/elevation.asc", overwrite = T, NAflag = -1000)
+writeRaster(r$slope, "Outputs/ASCIIs/slope.asc", overwrite = T, NAflag = -1000)
+writeRaster(r$distance, "Outputs/ASCIIs/distance.asc", overwrite = T, NAflag = -1000)
