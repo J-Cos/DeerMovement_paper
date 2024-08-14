@@ -28,7 +28,8 @@ df<-df %>%
 
 df<-df %>%
     mutate(cos_ta = cos(ta_), 
-        log_sl = log(sl_)) %>%
+        log_sl_100m = log(sl_/100),
+        log_distance = log(distance)) %>%
     mutate(season=lubridate::semester(t1_)) %>%
     mutate(season=as.factor(case_when(
         season ==2 ~ "Winter",
