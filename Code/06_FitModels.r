@@ -57,25 +57,25 @@ m4 <- df |> fit_clogit(
     log_sl_100m:sex:season:landcover +
     strata(id) + strata(step_id_))
 AIC(m4)
-#better
+#worse
 summary(m4)
 
 #remove season:slope
 m5 <- df |> fit_clogit(
     case_ ~ 
     landcover + slope + distance + log_sl_100m + cos_ta +
-    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope + log_sl_100m:sex + landcover:distance +cos_ta:slope +
+    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope + log_sl_100m:sex + landcover:distance +distance:season +cos_ta:slope +
     log_sl_100m:sex:season:landcover +
     strata(id) + strata(step_id_))
 AIC(m5)
-#better
+#worse
 summary(m5)
 
 #remove  log_sl_100m:sex 
 m6 <- df |> fit_clogit(
     case_ ~ 
     landcover + slope + distance + log_sl_100m + cos_ta +
-    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope + landcover:distance +cos_ta:slope +
+    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope + landcover:distance + season:slope +distance:season +cos_ta:slope +
     log_sl_100m:sex:season:landcover +
     strata(id) + strata(step_id_))
 AIC(m6)
@@ -86,7 +86,7 @@ summary(m6)
 m7 <- df |> fit_clogit(
     case_ ~ 
     landcover + slope + distance + log_sl_100m + cos_ta +
-    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope +cos_ta:slope +
+    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope + season:slope +distance:season +cos_ta:slope +
     log_sl_100m:sex:season:landcover +
     strata(id) + strata(step_id_))
 AIC(m7)
@@ -96,7 +96,7 @@ AIC(m7)
 m8 <- df |> fit_clogit(
     case_ ~ 
     landcover + slope + distance + log_sl_100m + cos_ta +
-    log_sl_100m:landcover + cos_ta:distance + log_sl_100m:slope + landcover:distance +cos_ta:slope +
+    log_sl_100m:landcover + cos_ta:distance + log_sl_100m:slope + landcover:distance + season:slope +distance:season +cos_ta:slope +
     log_sl_100m:sex:season:landcover +
     strata(id) + strata(step_id_))
 AIC(m8)
