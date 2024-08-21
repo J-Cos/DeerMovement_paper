@@ -8,6 +8,8 @@ library(MuMIn)
 library(tidyverse)
 library(amt)
 
+source(list.files("Code/Functions", full.names=TRUE))
+
 #load
 bursts<-readRDS("Outputs/bursts.RDS")
 sexmap<-readRDS("Outputs/sexmap.RDS") %>%
@@ -33,10 +35,8 @@ df<-df %>%
     mutate(cos_ta = cos(ta_), 
         log_sl_100m = log(sl_/100),
         log_distance = log(distance)) %>%
-    mutate(season=lubridate::semester(t1_)) %>%
-    mutate(season=as.factor(case_when(
-        season ==2 ~ "Winter",
-        season == 1 ~ "Summer"))) 
+    mutate(season=getTwoSeasons(t1_))
+
 
 # simplify the distance to release columns down to a single column with the correct values for each deer
 df_withDistance2Release<-df %>% pivot_longer(Roberto:Banditu, names_to="raster", values_to="distance2release") %>%
