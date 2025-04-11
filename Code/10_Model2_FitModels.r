@@ -16,8 +16,8 @@ df<-readRDS("Outputs/Model2Dataframe.RDS")
 # previous best model (model 6 in previous round)
 m0 <- df |> fit_clogit(
     case_ ~ 
-    landcover + slope + distance + log_sl_100m + cos_ta +
-    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope + landcover:distance + season:slope +distance:season +cos_ta:slope +
+    landcover + slope + log_distance + log_sl_100m + cos_ta +
+    log_sl_100m:landcover + cos_ta:log_distance + cos_ta:landcover + log_sl_100m:slope + landcover:log_distance + season:slope +distance:season +cos_ta:slope +
     log_sl_100m:sex:season:landcover +
     strata(id) + strata(step_id_))
 AIC(m0)
@@ -28,8 +28,8 @@ summary(m0)
 
 m1 <- df |> fit_clogit(
     case_ ~ 
-    landcover + slope + distance + log_sl_100m + cos_ta + log_distance2release +
-    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope + landcover:distance + season:slope +distance:season +cos_ta:slope +
+    landcover + slope + log_distance + log_sl_100m + cos_ta + log_distance2release +
+    log_sl_100m:landcover + cos_ta:log_distance + cos_ta:landcover + log_sl_100m:slope + landcover:log_distance + season:slope + season:log_distance +cos_ta:slope +
     log_sl_100m:sex:season:landcover +
     strata(id) + strata(step_id_))
 
@@ -37,7 +37,7 @@ AIC(m1)
 summary(m1) 
 
 
-#therfore m6 best
+#therfore m1 best
 sink("Outputs/BestModel2.txt")
 summary(m1)
 closeAllConnections()

@@ -16,8 +16,8 @@ df<-readRDS("Outputs/ModelDataframe.RDS")
 # saturated plausible model
 spm <- df |> fit_clogit(
     case_ ~ 
-    landcover + slope + distance + log_sl_100m + cos_ta +
-    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope + log_sl_100m:sex + landcover:distance + season:slope +distance:season +cos_ta:slope +
+    landcover + slope + log_distance + log_sl_100m + cos_ta +
+    log_sl_100m:landcover + cos_ta:log_distance + cos_ta:landcover + log_sl_100m:slope + log_sl_100m:sex + landcover:log_distance + season:slope +log_distance:season +cos_ta:slope +
     log_sl_100m:sex:season + 
     log_sl_100m:sex:season:landcover +
     strata(id) + strata(step_id_))
@@ -31,8 +31,8 @@ AIC(spm)
 #remove log_sl_100m:sex:season:landcover
 m2 <- df |> fit_clogit(
     case_ ~ 
-    landcover + slope + distance + log_sl_100m + cos_ta +
-    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope + log_sl_100m:sex + landcover:distance + season:slope +distance:season +cos_ta:slope +
+    landcover + slope + log_distance + log_sl_100m + cos_ta +
+    log_sl_100m:landcover + cos_ta:log_distance + cos_ta:landcover + log_sl_100m:slope + log_sl_100m:sex + landcover:log_distance + season:slope +log_distance:season +cos_ta:slope +
     log_sl_100m:sex:season + 
     strata(id) + strata(step_id_))
 AIC(m2)
@@ -41,19 +41,19 @@ AIC(m2)
 # remove log_sl_100m:sex:season 
 m3 <- df |> fit_clogit(
     case_ ~ 
-    landcover + slope + distance + log_sl_100m + cos_ta +
-    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope + log_sl_100m:sex + landcover:distance + season:slope +distance:season +cos_ta:slope +
+    landcover + slope + log_distance + log_sl_100m + cos_ta +
+    log_sl_100m:landcover + cos_ta:log_distance + cos_ta:landcover + log_sl_100m:slope + log_sl_100m:sex + landcover:log_distance + season:slope +log_distance:season +cos_ta:slope +
     log_sl_100m:sex:season:landcover +
     strata(id) + strata(step_id_))
 AIC(m3)
 #same
 summary(m3)
 
-# remove distance:season
+# remove log_distance:season
 m4 <- df |> fit_clogit(
     case_ ~ 
-    landcover + slope + distance + log_sl_100m + cos_ta +
-    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope + log_sl_100m:sex + landcover:distance + season:slope +cos_ta:slope +
+    landcover + slope + log_distance + log_sl_100m + cos_ta +
+    log_sl_100m:landcover + cos_ta:log_distance + cos_ta:landcover + log_sl_100m:slope + log_sl_100m:sex + landcover:log_distance + season:slope +cos_ta:slope +
     log_sl_100m:sex:season:landcover +
     strata(id) + strata(step_id_))
 AIC(m4)
@@ -63,8 +63,8 @@ summary(m4)
 #remove season:slope
 m5 <- df |> fit_clogit(
     case_ ~ 
-    landcover + slope + distance + log_sl_100m + cos_ta +
-    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope + log_sl_100m:sex + landcover:distance +distance:season +cos_ta:slope +
+    landcover + slope + log_distance + log_sl_100m + cos_ta +
+    log_sl_100m:landcover + cos_ta:log_distance + cos_ta:landcover + log_sl_100m:slope + log_sl_100m:sex + landcover:log_distance +log_distance:season +cos_ta:slope +
     log_sl_100m:sex:season:landcover +
     strata(id) + strata(step_id_))
 AIC(m5)
@@ -74,19 +74,19 @@ summary(m5)
 #remove  log_sl_100m:sex 
 m6 <- df |> fit_clogit(
     case_ ~ 
-    landcover + slope + distance + log_sl_100m + cos_ta +
-    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope + landcover:distance + season:slope +distance:season +cos_ta:slope +
+    landcover + slope + log_distance + log_sl_100m + cos_ta +
+    log_sl_100m:landcover + cos_ta:log_distance + cos_ta:landcover + log_sl_100m:slope + landcover:log_distance + season:slope +log_distance:season +cos_ta:slope +
     log_sl_100m:sex:season:landcover +
     strata(id) + strata(step_id_))
 AIC(m6)
 #same
 summary(m6) 
 
-# remove landcover:distance 
+# remove landcover:log_distance 
 m7 <- df |> fit_clogit(
     case_ ~ 
-    landcover + slope + distance + log_sl_100m + cos_ta +
-    log_sl_100m:landcover + cos_ta:distance + cos_ta:landcover + log_sl_100m:slope + season:slope +distance:season +cos_ta:slope +
+    landcover + slope + log_distance + log_sl_100m + cos_ta +
+    log_sl_100m:landcover + cos_ta:log_distance + cos_ta:landcover + log_sl_100m:slope + season:slope +log_distance:season +cos_ta:slope +
     log_sl_100m:sex:season:landcover +
     strata(id) + strata(step_id_))
 AIC(m7)
@@ -95,8 +95,8 @@ AIC(m7)
 # remove cos_ta:landcover 
 m8 <- df |> fit_clogit(
     case_ ~ 
-    landcover + slope + distance + log_sl_100m + cos_ta +
-    log_sl_100m:landcover + cos_ta:distance + log_sl_100m:slope + landcover:distance + season:slope +distance:season +cos_ta:slope +
+    landcover + slope + log_distance + log_sl_100m + cos_ta +
+    log_sl_100m:landcover + cos_ta:log_distance + log_sl_100m:slope + landcover:log_distance + season:slope +log_distance:season +cos_ta:slope +
     log_sl_100m:sex:season:landcover +
     strata(id) + strata(step_id_))
 AIC(m8)
