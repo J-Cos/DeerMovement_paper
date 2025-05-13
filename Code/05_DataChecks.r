@@ -61,6 +61,19 @@ df %>%
 #check project length
 interval(first(df$t1_), last(df$t2_)) /years(1)
 
+#check number of steps
+df %>%
+    group_by(step_id_, id) %>%
+    summarise(n())
+
+#check number of steps per deer
+df %>%
+    group_by( id, step_id_) %>%
+    summarise(n()) %>%
+    summarise(n=n()) %>%
+    pull(n) %>%
+    summary()
+
 
 
 # Considerations for max step length in ABM
