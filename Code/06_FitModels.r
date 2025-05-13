@@ -107,6 +107,8 @@ sink("Outputs/BestModel.txt")
 summary(m6)
 closeAllConnections()
 
+summary(m6)$coef %>% as.data.frame %>% rownames_to_column %>% as_tibble %>% write.csv("Outputs/BestModel.csv")
+
 
 ###########################################################################################################
 # end of code

@@ -42,6 +42,8 @@ sink("Outputs/BestModel2.txt")
 summary(m1)
 closeAllConnections()
 
+summary(m1)$coef %>% as.data.frame %>% rownames_to_column %>% as_tibble %>% write.csv("Outputs/BestModel2.csv")
+
 
 ###########################################################################################################
 # end of code
