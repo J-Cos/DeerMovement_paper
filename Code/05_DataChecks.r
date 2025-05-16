@@ -61,6 +61,17 @@ df %>%
 #check project length
 interval(first(df$t1_), last(df$t2_)) /years(1)
 
+# lengths by dder
+DeerInteverals<-df %>%
+    group_by(id) %>%
+    summarise(deerInts= interval(first(t1_), last(t2_)) /months(1)) %>% 
+    arrange(deerInts)
+
+DeerInteverals %>%
+    print(n=99)
+
+summary(DeerInteverals)
+
 #check number of steps
 df %>%
     group_by(step_id_, id) %>%
