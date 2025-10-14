@@ -7,16 +7,26 @@ library(tidyterra)
 library(terra)
 
 #1) load
-ascs<-( list.files("Outputs/DeerSimVisitMaps", full=TRUE))
+ascs<-( list.files("Outputs/EndJulySim/output_maps", full=TRUE))
 r<-terra::rast("Outputs/CombinedRaster.tif")
 bursts<-readRDS("Outputs/bursts.RDS")
+
+# for single output per sim #############
+simr<-terra::rast(ascs) %>% mean %>% terra::project(., r)
+#########################################
+
+# for 5 time poitns per sim ########################
+#remove those without all 5, gives us 41 sims
+sims<-str_sub(ascs, 1, 48)
+completeSims<-names(which(table(sims)==5))
+ascs<-ascs[sims %in% completeSims]
 
 #2) get simulated visits
 # create list of rasters per sim in order of steps completed
 r_l<-lapply(
     split(ascs, ceiling(seq_along(ascs)/5)), 
     function(item){ 
-        df<-data.frame("file"=item, "step"=as.numeric(str_sub(item, 48, -5))) %>%
+        df<-data.frame("file"=item, "step"=as.numeric(str_sub(item, 53, -5))) %>%
             arrange(step)
         r<-df %>%
             pull(file) %>%
@@ -25,27 +35,25 @@ r_l<-lapply(
         return(r)
     }
 )
-#align to raster
-r_l_aln<-lapply( r_l, 
-    function(item) {
-        simr<-terra::project(item, r)
-        return(simr)
-    })
-# get average visits in 2025 across sims
-simr<-lapply( r_l_aln, `[[`, 2) %>% 
+
+# get average visits at 2025 and then project (=faster)
+simr<-lapply( r_l, `[[`, 2) %>% 
     rast %>%
-    mean
+    mean %>%
+    terra::project(., r)
+##########################################
+
 #mask 0s
 simr[simr==0] <- NA
 #standardise to 0-1
-simr<-simr/max(values(simr)  , na.rm=TRUE)  
+simr<- log( simr/max(values(simr)  , na.rm=TRUE)*100 )
 
 
 # 3) get real deer visit raster, standaised to 0-1
 VisitDensity<-lapply( bursts$data, function(item){ vect(x=as.data.frame(item), crs=crs(r), geom=c("x_", "y_"))}) %>% 
     vect() %>%
     rasterize(., r, fun=length)
-VisitDensity<-VisitDensity/max(values(VisitDensity)  , na.rm=TRUE)  
+VisitDensity<-log(VisitDensity/max(values(VisitDensity)  , na.rm=TRUE)  *100)
 
 # 4) get corsica outline
 corsica<- (patches(r$elevation)==1) %>% as.polygons
@@ -63,7 +71,7 @@ p1<-ggplot() +
 p2<-ggplot() +
     geom_spatraster(data=simr, aes(fill=mean))+
     geom_spatvector(data=corsica, fill=NA)+
-    viridis::scale_fill_viridis("Visit rate", na.value = "transparent")+
+    viridis::scale_fill_viridis("Log visit rate", na.value = "transparent")+
     theme_bw()+
     facet_wrap(~"sim")
 
@@ -72,8 +80,9 @@ p2<-ggplot() +
 predicting_df<-as.data.frame(r) %>% filter(complete.cases(.)) 
 
 
-real_df<-as.data.frame(c(VisitDensity, r)) %>% filter(complete.cases(.))
+real_df<-as.data.frame(c(VisitDensity, r)) %>% filter(complete.cases(.))#  %>% filter(V1>0.01)
 real_rf<-ranger::ranger(V1~. , real_df, importance="impurity")
+sqrt(real_rf$prediction.error)
 ranger::importance(real_rf)
 pred_df<-cbind(predicting_df, "pred"=predict(real_rf, predicting_df)$predictions) %>%
     as_tibble %>%
@@ -83,6 +92,8 @@ pred_df<-cbind(predicting_df, "pred"=predict(real_rf, predicting_df)$predictions
 
 sim_df<-as.data.frame(c(simr, r)) %>% filter(complete.cases(.))
 sim_rf<-ranger::ranger(mean~. , sim_df, importance="impurity")
+sqrt(sim_rf$prediction.error)
+
 ranger::importance(sim_rf)
 predsim_df<-cbind(predicting_df, "pred"=predict(sim_rf, predicting_df)$predictions) %>%
     as_tibble %>%
@@ -94,7 +105,7 @@ plot_df<-rbind(cbind(pred_df, "type"="real"), cbind(predsim_df,  "type"="sim")) 
 
 p3<-ggplot(plot_df)+
     geom_hex(aes(y=value, x=(pred)), bins=30)+
-    viridis::scale_fill_viridis()+
+    viridis::scale_fill_viridis(option="turbo", trans = "log")+
     facet_grid(type~name, )+
     theme_bw()+
     guides(fill="none")+
@@ -122,21 +133,21 @@ pfun <- \(...) {
     predict(...)$predictions
 }
 
-pr1 <- predict(r, real_rf,  fun=pfun, na.rm = TRUE)
-pr2 <- predict(r, sim_rf,  fun=pfun, na.rm = TRUE)
+pr1 <- log(predict(r, real_rf,  fun=pfun, na.rm = TRUE) *100)
+pr2 <- log(predict(r, sim_rf,  fun=pfun, na.rm = TRUE)*100)
 
 m1<-ggplot() +
     geom_spatraster(data=pr1, aes(fill=lyr1))+
     theme_bw()+
     facet_wrap(~"real")+
-    viridis::scale_fill_viridis(na.value = "transparent",  limits=c(0,1))+
+    viridis::scale_fill_viridis(na.value = "transparent")+
     guides(fill="none")
 
 m2<-ggplot() +
     geom_spatraster(data=pr2, aes(fill=lyr1))+
     theme_bw()+
     facet_wrap(~"sim")+
-    viridis::scale_fill_viridis("Habitat\nsuitability", na.value = "transparent",  limits=c(0,1))
+    viridis::scale_fill_viridis("Log\nhabitat\nsuitability", na.value = "transparent")
 
 cowplot::plot_grid(m1, m2, labels = c('A', 'B'), label_size = 12, rel_widths=c(1, 1.15))
 ggsave("Figures/VisitMapHSMs.png", bg="white", height=8, width=10)
