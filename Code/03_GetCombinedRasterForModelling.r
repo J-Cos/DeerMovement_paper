@@ -36,7 +36,7 @@ r<-project(r, "EPSG:31467")
 
 #########################
 #check rasters
-ggplot()+
+p1<-ggplot()+
     geom_spatraster(data=r, aes(fill=landcover))+
     theme_minimal()
 
@@ -44,16 +44,18 @@ ggplot()+
     geom_spatraster(data=r, aes(fill=elevation))+
     theme_minimal()
 
-
-ggplot()+
+p2<-ggplot()+
     geom_spatraster(data=r, aes(fill=slope))+
     theme_minimal()
 
 values(r$landcover) %>% table
 
-ggplot()+
+p3<-ggplot()+
     geom_spatraster(data=r, aes(fill=distance))+
     theme_minimal()
+
+cowplot::plot_grid(p1, p2, p3, labels = c('Landcover', 'Slope', "Distance to road"), label_size = 12, ncol=3, rel_widths=c(1.1, 1,1))
+ggsave("Figures/LandCoverMaps.png", bg="white", height=8, width=15)
 
 #################
 #output as tif for SSF
