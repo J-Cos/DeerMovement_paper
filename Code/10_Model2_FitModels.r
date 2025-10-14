@@ -36,6 +36,17 @@ m1 <- df |> fit_clogit(
 AIC(m1)
 summary(m1) 
 
+#try ditance2release (unlogged)
+
+m2<- df |> fit_clogit(
+    case_ ~ 
+    landcover + slope + log_distance + log_sl_100m + cos_ta + distance2release +
+    log_sl_100m:landcover + cos_ta:log_distance + cos_ta:landcover + log_sl_100m:slope + landcover:log_distance + season:slope + season:log_distance +cos_ta:slope +
+    log_sl_100m:sex:season:landcover +
+    strata(id) + strata(step_id_))
+
+AIC(m2)
+summary(m2) 
 
 #therfore m1 best
 sink("Outputs/BestModel2.txt")
