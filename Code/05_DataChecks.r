@@ -18,6 +18,19 @@ crs(points)<-"EPSG:31467"
 hulls<-convHull(points, by="id")
 sites<-aggregate(hulls) %>% disagg
 
+#home range sizes
+summary(expanse(hulls)/1000^2) #km2
+summary(expanse(hulls)/10000) #ha
+sort(expanse(hulls)/10000) #ha
+
+ggplot()+
+    geom_density(aes(x=expanse(hulls)/10000), fill="grey")+
+    theme_classic()+
+    ggtitle("Observed Deer Home Ranges (Minimum Convex Polygons")+
+    xlab("Hectares")
+ggsave("Figures/ObservedDeerHomeRangeDistribution.png", height=10, width=10)
+
+# maps the home ranges
 siteMaps<-list()
 for (site in 1:length(sites)) {
     siteMaps[[site]]<- ggplot() +
@@ -76,6 +89,13 @@ summary(DeerInteverals)
 df %>%
     group_by(step_id_, id) %>%
     summarise(n())
+
+#check number of steps per deer
+df %>%
+    group_by(id) %>%
+    summarise(n=n()) %>%
+    arrange(n) %>%
+    print(n=99)
 
 #check number of steps per deer
 df %>%
